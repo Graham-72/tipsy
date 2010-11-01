@@ -1,0 +1,69 @@
+<?php 
+
+/*
+ * Implementation of hook_init()
+ */
+
+function tipsy_init() {
+	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/jquery.tipsy.js');
+	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.js');
+	drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.css');
+}
+
+
+/*
+ * Implementation of hook_menu()
+ */
+
+function tipsy_menu() {
+	$items['admin/settings/tipsy'] = array(
+		'title' => t("Tipsy Settings"),
+		'page callback' => 'drupal_get_form',
+		'access arguments' => array('administer tipsy'),
+	);
+	return $items;
+}
+
+/*
+ * Implementation of tipsy_form()
+ */
+
+function tipsy_admin_form() {
+	$form = array();
+		$form['element_classes'] = array(
+			'#type' => 'textarea',
+			'#title' => t('Classes'),
+			'#description' => "t('Add divs that contains anchors')",
+			'#cols' => 20,
+			'#required' => FALSE,
+			'#default_value' => $settings['tipsy_elements'],
+			'#rows' => 5,
+		);
+		$form['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Save Configuration'),
+		);
+	return $form;
+}
+
+/*
+ * function form_submit
+ */
+
+function tipsy_admin_form_submit($form, &$form_values) {
+	$settings = array(
+		'tipsy_elements' => $form_values['values']['element_classes']
+	);
+	variable_set('tipsy_settings', $settings);
+	drupal_set_message(t('Configuration Saved'));
+}
+
+/*
+ * Implementation of hook_footer().
+ */
+
+function tipsy_footer($main = 0) {
+	$settings = variable_get('tipsy_settings', array());
+	return $settings['tipsy_elements'];
+}
+
