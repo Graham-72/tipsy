@@ -1,12 +1,12 @@
-<?php 
+<?php // $Id$
 
 /*
  * Implementation of hook_init()
  */
 function tipsy_init() {
-	drupal_add_js(drupal_get_path('module', 'tipsy') . '/js/jquery.tipsy.js');
-	drupal_add_js(drupal_get_path('module', 'tipsy') . '/js/tipsy.drupal.js');
-	drupal_add_css(drupal_get_path('module', 'tipsy') . '/css/tipsy.css');
+	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/jquery.tipsy.js');
+	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.drupal.js');
+	drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.css');
 	//variable_del('tipsy');
 }
 
@@ -23,6 +23,14 @@ function tipsy_menu() {
 	  'page arguments' => array('tipsy_admin'),
 	  'file' => 'tipsy.admin.inc'
 	);
+	$items['tipsy/ahah'] = array(
+    'title' => t('Tipsy AHAH callback'),
+    'description' => t('Tipsy AHAH callback.'),
+    'page callback' => '_tipsy_custom_selectors_ahah',
+    'access arguments' => array('administer tipsy'),
+    'file' => 'tipsy.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
 	return $items;
 }
 
@@ -34,69 +42,27 @@ function tipsy_perm() {
 }
 
 /*
- * function form_submit
+ * Implementation of hook_theme().
  */
-function tipsy_admin_submit($form, &$form_values) {
-	$settings = array();
-	$settings['drupal_forms'] = array(
-	  'form_descriptions' => $form_values['values']['form_descriptions'],
-    'form_descriptions_fade' => $form_values['values']['form_descriptions_fade'],
-    'form_descriptions_gravity' => $form_values['values']['form_descriptions_gravity'],
-    'form_descriptions_delayin' => $form_values['values']['form_descriptions_delayin'],
-    'form_descriptions_delayout' => $form_values['values']['form_descriptions_delayout'],
-    'form_descriptions_trigger' => $form_values['values']['form_descriptions_trigger'],
-    'form_descriptions_opacity' => $form_values['values']['form_descriptions_opacity'],
-    'form_descriptions_offset' => $form_values['values']['form_descriptions_offset']
+function tipsy_theme() {
+  return array(
+    'tipsy_custom_selectors_form' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'tipsy.admin.inc',
+    ),
   );
-	variable_set('tipsy', $settings);
-	drupal_set_message(t('Configuration Saved'));
-}
-
-/*
- * Implementation of hook_footer().
- */
-function tipsy_footer($main = 0) {
-	$settings = variable_get('tipsy_settings', array());
-	return $settings['$selector'];
 }
 
 /*
  * Implementation of template_preprocess_page().
  */
 function tipsy_preprocess_page(&$vars) {
-  $settings = _tipsy_get_settings();//die(print_r($settings));
-  
-  if ($settings['drupal_forms']['form_descriptions']) {
-  	    
+  $settings = _tipsy_get_settings();
+  if (!$settings['drupal_forms']['forms']) {
+  	unset($settings['drupal_forms']);
   }
-  
-  foreach ($settings as $key => $setting) {
-  	
-  }
-}
-
-/*
- * Tipsy helper function 
- */
-function tipsy_add($selector, $settings = NULL) {
-  $tipsy_selectors = array();
-  /*
-	if (is_null($settings)) {
-    $settings = array(
-	    'delayIn' => 0,      // delay before showing tooltip (ms)
-	    'delayOut' => 0,     // delay before hiding tooltip (ms)
-	    'fade' => true,     // fade tooltips in/out?
-	    'fallback' => '',    // fallback text to use when no tooltip text
-	    'gravity' => '$.fn.tipsy.autoNS',    // gravity
-	    'html'  => false,    // is tooltip content HTML?
-	    'offset' => 0,       // pixel offset of tooltip from element
-	    'opacity' => 0.8,    // opacity of tooltip
-	    'title'  => 'title', // attribute/callback containing tooltip text
-	    'trigger' => 'hover' // how tooltip is triggered - hover | focus | manual
-    );
-  }*/
-  
-  drupal_add_js($tipsy_selectors, 'setting');
+  drupal_add_js(array('tipsy' => $settings), 'setting');
+  $vars['scripts'] = drupal_get_js();
 }
 
 /*
@@ -104,15 +70,22 @@ function tipsy_add($selector, $settings = NULL) {
  */
 function _tipsy_get_settings() {
  	$drupal_forms = array(
-    'form_descriptions' => true,
- 	  'form_descriptions_fade' => true,
- 	  'form_descriptions_gravity' => 'w',
- 	  'form_descriptions_delayin' => 0,
- 	  'form_descriptions_delayout' => 0,
- 	  'form_descriptions_trigger' => 'focus',
- 	  'form_descriptions_opacity' => '0.8',
- 	  'form_descriptions_offset' => 0
+    'forms' => true,
+ 	  'options' => array(
+      'fade' => true, 'gravity' => 'autoWE', 'delayIn' => 0, 'delayOut' => 0,
+	    'trigger' => 'focus', 'opacity' => '0.8', 'offset' => 0
+    )
   );
-  $all_settings = array('drupal_forms' => $drupal_forms);//die(print_r(variable_get('tipsy', $all_settings)));
+  $default_selector = array(
+    'selector' => 'a, .tipsy',
+    'options' => array(
+      'fade' => true, 'gravity' => 'w', 'delayIn' => 0, 'delayOut' => 0,
+	    'trigger' => 'hover', 'opacity' => '0.8', 'offset' => 0
+    )
+  );
+  $all_settings = array(
+    'drupal_forms' => $drupal_forms,
+    'custom_selectors' => array($default_selector)
+  );
   return variable_get('tipsy', $all_settings);
 }

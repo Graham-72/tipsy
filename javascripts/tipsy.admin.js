@@ -1,10 +1,12 @@
+// $Id$
 Drupal.behaviors.tipsyAdmin = function(context) {
-	$('input#edit-form-descriptions:checked').click(function() {
+	($('input#edit-forms:checked').length > 0) ? $('#tipsy-drupal-forms-wrapper').show() : $('#tipsy-drupal-forms-wrapper').hide();
+	$('input#edit-forms').click(function() {
 		if($(this).is(':checked')) {
-			$('.tipsy-form_descriptions_elements-wrapper').slideDown();
+			$('#tipsy-drupal-forms-wrapper').slideDown();
 		}
 		else {
-			$('.tipsy-form_descriptions_elements-wrapper').slideUp();
+			$('#tipsy-drupal-forms-wrapper').slideUp();
 		}
 	});
 };

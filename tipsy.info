@@ -1,5 +1,5 @@
 ; $Id$
-name = Tipsy
-description = Add Tipsy Tooltips to your anchors.
+
+name = Tipsy tooltips
+description = Integrates <a href="http://onehackoranother.com/projects/jquery/tipsy/">Tipsy</a> jQuery plugin for creating a Facebook-like tooltips effect based on an anchor tag's title attribute.
 core = 6.x
-version = VERSION 
