@@ -3,67 +3,116 @@
 /*
  * Implementation of hook_init()
  */
-
 function tipsy_init() {
-	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/jquery.tipsy.js');
-	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.js');
-	drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.css');
+	drupal_add_js(drupal_get_path('module', 'tipsy') . '/js/jquery.tipsy.js');
+	drupal_add_js(drupal_get_path('module', 'tipsy') . '/js/tipsy.drupal.js');
+	drupal_add_css(drupal_get_path('module', 'tipsy') . '/css/tipsy.css');
+	//variable_del('tipsy');
 }
-
 
 /*
  * Implementation of hook_menu()
  */
-
 function tipsy_menu() {
 	$items['admin/settings/tipsy'] = array(
-		'title' => t("Tipsy Settings"),
+		'title' => t("Tipsy settings"),
+	  'description' => t('Integrates tipsy tooltips with Drupal'),
 		'page callback' => 'drupal_get_form',
+	  'access callback' => 'user_access',
 		'access arguments' => array('administer tipsy'),
+	  'page arguments' => array('tipsy_admin'),
+	  'file' => 'tipsy.admin.inc'
 	);
 	return $items;
 }
 
 /*
- * Implementation of tipsy_form()
+ * Implementation of hook_perm().
  */
-
-function tipsy_admin_form() {
-	$form = array();
-		$form['element_classes'] = array(
-			'#type' => 'textarea',
-			'#title' => t('Classes'),
-			'#description' => "t('Add divs that contains anchors')",
-			'#cols' => 20,
-			'#required' => FALSE,
-			'#default_value' => $settings['tipsy_elements'],
-			'#rows' => 5,
-		);
-		$form['submit'] = array(
-			'#type' => 'submit',
-			'#value' => t('Save Configuration'),
-		);
-	return $form;
+function tipsy_perm() {
+  return array('administer tipsy');
 }
 
 /*
  * function form_submit
  */
-
-function tipsy_admin_form_submit($form, &$form_values) {
-	$settings = array(
-		'tipsy_elements' => $form_values['values']['element_classes']
-	);
-	variable_set('tipsy_settings', $settings);
+function tipsy_admin_submit($form, &$form_values) {
+	$settings = array();
+	$settings['drupal_forms'] = array(
+	  'form_descriptions' => $form_values['values']['form_descriptions'],
+    'form_descriptions_fade' => $form_values['values']['form_descriptions_fade'],
+    'form_descriptions_gravity' => $form_values['values']['form_descriptions_gravity'],
+    'form_descriptions_delayin' => $form_values['values']['form_descriptions_delayin'],
+    'form_descriptions_delayout' => $form_values['values']['form_descriptions_delayout'],
+    'form_descriptions_trigger' => $form_values['values']['form_descriptions_trigger'],
+    'form_descriptions_opacity' => $form_values['values']['form_descriptions_opacity'],
+    'form_descriptions_offset' => $form_values['values']['form_descriptions_offset']
+  );
+	variable_set('tipsy', $settings);
 	drupal_set_message(t('Configuration Saved'));
 }
 
 /*
  * Implementation of hook_footer().
  */
-
 function tipsy_footer($main = 0) {
 	$settings = variable_get('tipsy_settings', array());
-	return $settings['tipsy_elements'];
+	return $settings['$selector'];
 }
 
+/*
+ * Implementation of template_preprocess_page().
+ */
+function tipsy_preprocess_page(&$vars) {
+  $settings = _tipsy_get_settings();//die(print_r($settings));
+  
+  if ($settings['drupal_forms']['form_descriptions']) {
+  	    
+  }
+  
+  foreach ($settings as $key => $setting) {
+  	
+  }
+}
+
+/*
+ * Tipsy helper function 
+ */
+function tipsy_add($selector, $settings = NULL) {
+  $tipsy_selectors = array();
+  /*
+	if (is_null($settings)) {
+    $settings = array(
+	    'delayIn' => 0,      // delay before showing tooltip (ms)
+	    'delayOut' => 0,     // delay before hiding tooltip (ms)
+	    'fade' => true,     // fade tooltips in/out?
+	    'fallback' => '',    // fallback text to use when no tooltip text
+	    'gravity' => '$.fn.tipsy.autoNS',    // gravity
+	    'html'  => false,    // is tooltip content HTML?
+	    'offset' => 0,       // pixel offset of tooltip from element
+	    'opacity' => 0.8,    // opacity of tooltip
+	    'title'  => 'title', // attribute/callback containing tooltip text
+	    'trigger' => 'hover' // how tooltip is triggered - hover | focus | manual
+    );
+  }*/
+  
+  drupal_add_js($tipsy_selectors, 'setting');
+}
+
+/*
+ * Helper function to retreive all settings for tipsy
+ */
+function _tipsy_get_settings() {
+ 	$drupal_forms = array(
+    'form_descriptions' => true,
+ 	  'form_descriptions_fade' => true,
+ 	  'form_descriptions_gravity' => 'w',
+ 	  'form_descriptions_delayin' => 0,
+ 	  'form_descriptions_delayout' => 0,
+ 	  'form_descriptions_trigger' => 'focus',
+ 	  'form_descriptions_opacity' => '0.8',
+ 	  'form_descriptions_offset' => 0
+  );
+  $all_settings = array('drupal_forms' => $drupal_forms);//die(print_r(variable_get('tipsy', $all_settings)));
+  return variable_get('tipsy', $all_settings);
+}
