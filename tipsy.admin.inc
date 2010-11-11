@@ -153,7 +153,7 @@ function tipsy_options_form($settings = false, $drupal_forms = false) {
       '#title' => t('Tooltip content'),
 	    '#default_value' => $settings['options']['title'],
 	    '#description' => t("Specify the HTML attribute which will be the content of the tooltip.<br />If left blank, this will always be the <em>title</em> attribute.<br />Refer to the module's README.txt for advanced usage of this feature."),
-	    '#rows' => 2,
+	    '#rows' => 1,
 	    '#maxlength' => 400,
       '#weight' => 9,
     );
@@ -234,7 +234,7 @@ function tipsy_admin_validate($form, &$form_values) {
 	    if (!is_numeric($rule['options']['offset']) || $rule['options']['offset'] == '') {
 	      form_set_error('rules][' . $delta .  '][options][offset', t('Invalid value'));
 	    }
-  	  if (!is_numeric($rule['options']['title']) || $rule['options']['title'] == '') {
+  	  if (trim($rule['options']['title']) == '') {
         form_set_error('rules][' . $delta .  '][options][title', t('Invalid value set for title'));
       }
   	}

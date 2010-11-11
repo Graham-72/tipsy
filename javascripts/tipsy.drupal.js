@@ -34,7 +34,7 @@ Drupal.behaviors.tipsy = function(context) {
 			    fade: parseInt(options.fade),
 			    gravity: tipsy_determine_gravity(options.gravity), 
 			    offset: parseInt(options.offset),
-			    opacity: parseInt(options.opacity),
+			    opacity: parseFloat(options.opacity),
 			    trigger: options.trigger
 			});
 		});
