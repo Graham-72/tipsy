@@ -7,7 +7,7 @@ Drupal.behaviors.tipsy = function(context) {
 			desc.css('display', 'none');
 			if(desc.length > 0) {
 				formSettings = Drupal.settings.tipsy.drupal_forms.options;
-				$(this).find('input,textarea,select,.option,.form-checkboxes,.form-radios').tipsy({
+				$(this).find('input[type=text],input[type=password],textarea,select,.option').tipsy({
 					title: function() { return desc.html(); },
 					html: true,
 					delayIn: parseInt(formSettings.delayIn),
