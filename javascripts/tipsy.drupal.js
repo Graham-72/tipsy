@@ -4,6 +4,7 @@ Drupal.behaviors.tipsy = function(context) {
 		var formElement = $('.form-item');
 		formElement.each(function(){
 			var desc = $(this).find('.description');
+			desc.css('display', 'none');
 			if(desc.length > 0) {
 				formSettings = Drupal.settings.tipsy.drupal_forms.options;
 				$(this).find('input,textarea,select,.option,.form-checkboxes,.form-radios').tipsy({
@@ -24,7 +25,18 @@ Drupal.behaviors.tipsy = function(context) {
 		var selectors = Drupal.settings.tipsy.custom_selectors;
 		$(selectors).each(function(){
 			var selector = $(this)[0].selector;
-			$(selector).tipsy({});
+			var options = $(this)[0].options;
+			$(selector).tipsy({
+				title: options.title,
+				html: parseInt(options.html),
+				delayIn: parseInt(options.delayIn),
+			    delayOut: parseInt(options.delayOut),
+			    fade: parseInt(options.fade),
+			    gravity: tipsy_determine_gravity(options.gravity), 
+			    offset: parseInt(options.offset),
+			    opacity: parseInt(options.opacity),
+			    trigger: options.trigger
+			});
 		});
 	}
 };

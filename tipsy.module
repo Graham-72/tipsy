@@ -7,6 +7,10 @@ function tipsy_init() {
 	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/jquery.tipsy.js');
 	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.drupal.js');
 	drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.css');
+	if ($_GET['q'] == 'admin/settings/tipsy') {
+		drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.admin.js');
+    drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.admin.css');
+	}
 	//variable_del('tipsy');
 }
 
@@ -58,9 +62,10 @@ function tipsy_theme() {
  */
 function tipsy_preprocess_page(&$vars) {
   $settings = _tipsy_get_settings();
-  if (!$settings['drupal_forms']['forms']) {
+  if ($settings['drupal_forms']['forms'] == 0) {
   	unset($settings['drupal_forms']);
   }
+  //die(print_r($settings));
   drupal_add_js(array('tipsy' => $settings), 'setting');
   $vars['scripts'] = drupal_get_js();
 }
@@ -68,24 +73,36 @@ function tipsy_preprocess_page(&$vars) {
 /*
  * Helper function to retreive all settings for tipsy
  */
-function _tipsy_get_settings() {
- 	$drupal_forms = array(
-    'forms' => true,
- 	  'options' => array(
-      'fade' => true, 'gravity' => 'autoWE', 'delayIn' => 0, 'delayOut' => 0,
-	    'trigger' => 'focus', 'opacity' => '0.8', 'offset' => 0
-    )
-  );
-  $default_selector = array(
-    'selector' => 'a, .tipsy',
-    'options' => array(
-      'fade' => true, 'gravity' => 'w', 'delayIn' => 0, 'delayOut' => 0,
-	    'trigger' => 'hover', 'opacity' => '0.8', 'offset' => 0
-    )
-  );
-  $all_settings = array(
-    'drupal_forms' => $drupal_forms,
-    'custom_selectors' => array($default_selector)
-  );
-  return variable_get('tipsy', $all_settings);
+function _tipsy_get_settings($new_rule = false) {
+  if ($new_rule == true) {
+  	$settings = array(
+	    'selector' => '',
+	    'options' => array(
+	      'fade' => 1, 'gravity' => 'w', 'delayIn' => 0, 'delayOut' => 0,
+	      'trigger' => 'hover', 'opacity' => '0.8', 'offset' => 0, 'html' => 0, 'title' => 'title'
+	    )
+	  );
+  } 
+  else {
+  	$wide_settings = array(
+  	  'drupal_forms' => array(
+	      'forms' => true,
+	      'options' => array(
+	        'fade' => 1, 'gravity' => 'autoWE', 'delayIn' => 0, 'delayOut' => 0,
+	        'trigger' => 'focus', 'opacity' => '0.8', 'offset' => 0
+	      )
+	    ),
+	    'custom_selectors' => array(
+	      0 => array(
+		      'selector' => '.tipsy',
+		      'options' => array(
+		        'fade' => 1, 'gravity' => 'w', 'delayIn' => 0, 'delayOut' => 0,
+		        'trigger' => 'hover', 'opacity' => '0.8', 'offset' => 0, 'html' => 0, 'title' => 'title'
+		      )
+		    )
+	    )
+  	);
+  	$settings = variable_get('tipsy', $wide_settings);
+  }
+  return $settings;
 }
