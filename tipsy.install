@@ -7,7 +7,7 @@ function tipsy_install() {
 	db_query("UPDATE {system} SET weight = 999 WHERE name = 'tipsy'");
 	drupal_set_message(t("Tipsy has been successfully installed. Visit the <a href=@href>settings page</a> for tooltips of your choice.", array('@href' => base_path() . 'admin/settings/tipsy')));
 }
-
+ 
 /*
  * Implementation of hook_uninstall()
  */

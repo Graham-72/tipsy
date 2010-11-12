@@ -5,7 +5,7 @@
  */
 function tipsy_admin() {
   $settings = _tipsy_get_settings();
-  
+   
   $form = array();
   $form['drupal_forms'] = array(
     '#type' => 'fieldset',

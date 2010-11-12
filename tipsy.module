@@ -12,7 +12,7 @@ function tipsy_init() {
     drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.admin.css');
 	}
 	//variable_del('tipsy');
-}
+} 
 
 /*
  * Implementation of hook_menu()
