@@ -4,15 +4,19 @@
  * Implementation of hook_init()
  */
 function tipsy_init() {
+	$settings = _tipsy_get_settings();
 	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/jquery.tipsy.js');
-	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.drupal.js');
+	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.js');
 	drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.css');
 	if ($_GET['q'] == 'admin/settings/tipsy') {
 		drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.admin.js');
     drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.admin.css');
 	}
-	//variable_del('tipsy');
-} 
+  if ($settings['drupal_forms']['forms'] == 0) {
+    unset($settings['drupal_forms']);
+  }
+  drupal_add_js(array('tipsy' => $settings), 'setting');
+}
 
 /*
  * Implementation of hook_menu()
@@ -27,9 +31,9 @@ function tipsy_menu() {
 	  'page arguments' => array('tipsy_admin'),
 	  'file' => 'tipsy.admin.inc'
 	);
-	$items['tipsy/ahah'] = array(
-    'title' => t('Tipsy AHAH callback'),
-    'description' => t('Tipsy AHAH callback.'),
+	$items['admin/settings/tipsy/ahah'] = array(
+    'title' => t('Tipsy admin AHAH callback'),
+    'description' => t('Tipsy admin AHAH callback.'),
     'page callback' => '_tipsy_custom_selectors_ahah',
     'access arguments' => array('administer tipsy'),
     'file' => 'tipsy.admin.inc',
@@ -58,19 +62,6 @@ function tipsy_theme() {
 }
 
 /*
- * Implementation of template_preprocess_page().
- */
-function tipsy_preprocess_page(&$vars) {
-  $settings = _tipsy_get_settings();
-  if ($settings['drupal_forms']['forms'] == 0) {
-  	unset($settings['drupal_forms']);
-  }
-  //die(print_r($settings));
-  drupal_add_js(array('tipsy' => $settings), 'setting');
-  $vars['scripts'] = drupal_get_js();
-}
-
-/*
  * Helper function to retreive all settings for tipsy
  */
 function _tipsy_get_settings($new_rule = false) {
@@ -82,7 +73,7 @@ function _tipsy_get_settings($new_rule = false) {
 	      'trigger' => 'hover', 'opacity' => '0.8', 'offset' => 0, 'html' => 0, 'title' => 'title'
 	    )
 	  );
-  } 
+  }
   else {
   	$wide_settings = array(
   	  'drupal_forms' => array(

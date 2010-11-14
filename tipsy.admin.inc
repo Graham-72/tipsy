@@ -46,13 +46,12 @@ function tipsy_admin() {
     '#value' => t('Add another rule'),
     '#submit' => array('tipsy_custom_selectors_add'), // If no javascript action.
     '#ahah' => array(
-      'path' => 'tipsy/ahah',
+      'path' => 'admin/settings/tipsy/ahah',
       'wrapper' => 'tipsy-custom-selectors',
       'method' => 'replace',
       'effect' => 'fade',
     ),
   );
-  
   if ($settings['custom_selectors']) {
 	  foreach ($settings['custom_selectors'] as $delta => $options) {
 	    $form['custom_selectors']['rules'][$delta] = tipsy_custom_selector_form($options);
@@ -152,7 +151,7 @@ function tipsy_options_form($settings = false, $drupal_forms = false) {
       '#type' => 'textarea',
       '#title' => t('Tooltip content'),
 	    '#default_value' => $settings['options']['title'],
-	    '#description' => t("Specify the HTML attribute which will be the content of the tooltip.<br />If left blank, this will always be the <em>title</em> attribute.<br />Refer to the module's README.txt for advanced usage of this feature."),
+	    '#description' => t("Specify the HTML attribute which will be the content of the tooltip.<br />Refer to the module's README.txt for advanced usage of this feature."),
 	    '#rows' => 1,
 	    '#maxlength' => 400,
       '#weight' => 9,
@@ -235,7 +234,7 @@ function tipsy_admin_validate($form, &$form_values) {
 	      form_set_error('rules][' . $delta .  '][options][offset', t('Invalid value'));
 	    }
   	  if (trim($rule['options']['title']) == '') {
-        form_set_error('rules][' . $delta .  '][options][title', t('Invalid value set for title'));
+        form_set_error('rules][' . $delta .  '][options][title', t("Invalid value set for title. Use <em>title</em> if you don't know what you are doing"));
       }
   	}
   }
