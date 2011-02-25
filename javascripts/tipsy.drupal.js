@@ -1,4 +1,3 @@
-// $Id$
 Drupal.behaviors.tipsy = function(context) {
 	if (Drupal.settings.tipsy.drupal_forms) {
 		var formElement = $('.form-item');
