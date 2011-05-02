@@ -1,99 +1,144 @@
-<?php // $Id$
+<?php
 
-/*
- * Implementation of hook_init()
+/**
+ * Implements hook_init().
  */
 function tipsy_init() {
-	$settings = _tipsy_get_settings();
-	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/jquery.tipsy.js');
-	drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.js');
-	drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.css');
-	if ($_GET['q'] == 'admin/settings/tipsy') {
-		drupal_add_js(drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.admin.js');
-    drupal_add_css(drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.admin.css');
-	}
+  drupal_add_library('tipsy', 'tipsy', TRUE);
+}
+
+/**
+ * Implements hook_library().
+ */
+function tipsy_library() {
+  $libraries = array();
+  $libraries['tipsy'] = array(
+    'title' => 'Tipsy',
+    'website' => 'http://onehackoranother.com/projects/jquery/tipsy/',
+    'version' => '0.1.7',
+    'js' => array(
+      drupal_get_path('module', 'tipsy') . '/javascripts/jquery.tipsy.js' => array(),
+      drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.js' => array(),
+    ),
+    'css' => array(
+      drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.css' => array(
+        'type' => 'file',
+        'media' => 'screen',
+      ),
+    ),
+  );
+
+  $settings = _tipsy_get_settings();
   if ($settings['drupal_forms']['forms'] == 0) {
     unset($settings['drupal_forms']);
   }
   drupal_add_js(array('tipsy' => $settings), 'setting');
+
+  return $libraries;
 }
 
-/*
- * Implementation of hook_menu()
+/**
+ * Implements hook_menu().
  */
 function tipsy_menu() {
-	$items['admin/settings/tipsy'] = array(
-		'title' => t("Tipsy settings"),
-	  'description' => t('Integrates tipsy tooltips with Drupal'),
-		'page callback' => 'drupal_get_form',
-	  'access callback' => 'user_access',
-		'access arguments' => array('administer tipsy'),
-	  'page arguments' => array('tipsy_admin'),
-	  'file' => 'tipsy.admin.inc'
-	);
-	$items['admin/settings/tipsy/ahah'] = array(
-    'title' => t('Tipsy admin AHAH callback'),
-    'description' => t('Tipsy admin AHAH callback.'),
-    'page callback' => '_tipsy_custom_selectors_ahah',
+  $items['admin/config/tipsy'] = array(
+    'title' => t("Tipsy settings"),
+    'description' => t('Integrates tipsy tooltips with Drupal'),
+    'page callback' => 'drupal_get_form',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer tipsy'),
+    'page arguments' => array('tipsy_admin'),
+    'file' => 'tipsy.admin.inc',
+  );
+  $items['admin/config/tipsy/ajax'] = array(
+    'title' => t('Tipsy admin AJAX callback'),
+    'description' => t('Tipsy admin AJAX callback.'),
+    'page callback' => '_tipsy_custom_selectors_callback',
     'access arguments' => array('administer tipsy'),
     'file' => 'tipsy.admin.inc',
     'type' => MENU_CALLBACK,
   );
-	return $items;
+  return $items;
 }
 
-/*
- * Implementation of hook_perm().
+/**
+ * Implements hook_perm().
  */
-function tipsy_perm() {
-  return array('administer tipsy');
+function tipsy_permission() {
+  $permissions = array(
+    'administer tipsy' => array(
+      'title' => t('Administer tipsy'),
+      'description' => t('Allows users to configure tipsy.'),
+    ),
+  );
+
+  return $permissions;
 }
 
-/*
- * Implementation of hook_theme().
+/**
+ * Implements hook_theme().
  */
 function tipsy_theme() {
   return array(
     'tipsy_custom_selectors_form' => array(
-      'arguments' => array('form' => NULL),
+      'render element' => 'form',
       'file' => 'tipsy.admin.inc',
     ),
   );
 }
 
-/*
+/**
  * Helper function to retreive all settings for tipsy
  */
-function _tipsy_get_settings($new_rule = false) {
-  if ($new_rule == true) {
-  	$settings = array(
-	    'selector' => '',
-	    'options' => array(
-	      'fade' => 1, 'gravity' => 'w', 'delayIn' => 0, 'delayOut' => 0,
-	      'trigger' => 'hover', 'opacity' => '0.8', 'offset' => 0, 'html' => 0, 'title' => 'title'
-	    )
-	  );
+function _tipsy_get_settings($new_rule = FALSE) {
+  if ($new_rule == TRUE) {
+    $settings = array(
+      'selector' => '',
+      'options' => array(
+        'fade' => 1,
+        'gravity' => 'w',
+        'delayIn' => 0,
+        'delayOut' => 0,
+        'trigger' => 'hover',
+        'opacity' => '0.8',
+        'offset' => 0,
+        'html' => 0,
+        'title' => 'title',
+      ),
+    );
   }
   else {
-  	$wide_settings = array(
-  	  'drupal_forms' => array(
-	      'forms' => true,
-	      'options' => array(
-	        'fade' => 1, 'gravity' => 'autoWE', 'delayIn' => 0, 'delayOut' => 0,
-	        'trigger' => 'focus', 'opacity' => '0.8', 'offset' => 0
-	      )
-	    ),
-	    'custom_selectors' => array(
-	      0 => array(
-		      'selector' => '.tipsy',
-		      'options' => array(
-		        'fade' => 1, 'gravity' => 'w', 'delayIn' => 0, 'delayOut' => 0,
-		        'trigger' => 'hover', 'opacity' => '0.8', 'offset' => 0, 'html' => 0, 'title' => 'title'
-		      )
-		    )
-	    )
-  	);
-  	$settings = variable_get('tipsy', $wide_settings);
+    $wide_settings = array(
+      'drupal_forms' => array(
+        'forms' => TRUE,
+        'options' => array(
+          'fade' => 1,
+          'gravity' => 'autoWE',
+          'delayIn' => 0,
+          'delayOut' => 0,
+          'trigger' => 'focus',
+          'opacity' => '0.8',
+          'offset' => 0,
+        ),
+      ),
+      'custom_selectors' => array(
+        0 => array(
+          'selector' => '.tipsy',
+          'options' => array(
+            'fade' => 1,
+            'gravity' => 'w',
+            'delayIn' => 0,
+            'delayOut' => 0,
+            'trigger' => 'hover',
+            'opacity' => '0.8',
+            'offset' => 0,
+            'html' => 0,
+            'title' => 'title',
+          ),
+        ),
+      ),
+    );
+    $settings = variable_get('tipsy', $wide_settings);
   }
   return $settings;
 }
