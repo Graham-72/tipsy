@@ -311,10 +311,3 @@ function tipsy_admin_submit($form, &$form_values) {
   variable_set('tipsy', $settings);
   drupal_set_message(t('Configuration saved'));
 }
-
-/**
- * This function will work if JavaScript is disabled to add the new tipsy rule form
- */
-function tipsy_custom_selectors_add() {
-
-}

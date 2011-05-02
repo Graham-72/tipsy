@@ -50,14 +50,6 @@ function tipsy_menu() {
     'page arguments' => array('tipsy_admin'),
     'file' => 'tipsy.admin.inc',
   );
-  $items['admin/config/tipsy/ajax'] = array(
-    'title' => t('Tipsy admin AJAX callback'),
-    'description' => t('Tipsy admin AJAX callback.'),
-    'page callback' => '_tipsy_custom_selectors_callback',
-    'access arguments' => array('administer tipsy'),
-    'file' => 'tipsy.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
   return $items;
 }
 
