@@ -102,7 +102,7 @@ function _tipsy_get_settings($new_rule = FALSE) {
   else {
     $wide_settings = array(
       'drupal_forms' => array(
-        'forms' => TRUE,
+        'forms' => FALSE,
         'options' => array(
           'fade' => 1,
           'gravity' => 'autoWE',
