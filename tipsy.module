@@ -149,7 +149,6 @@ function _tipsy_get_settings($new_rule = FALSE) {
       }
     }
     if ($converted_settings) {
-      dsm('converted');
       variable_set('tipsy', $settings);
     }
   }
