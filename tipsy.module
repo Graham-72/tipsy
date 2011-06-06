@@ -95,7 +95,10 @@ function _tipsy_get_settings($new_rule = FALSE) {
         'opacity' => '0.8',
         'offset' => 0,
         'html' => 0,
-        'title' => 'title',
+        'tooltip_content' => array(
+          'source' => 'attribute',
+          'selector' => 'title'
+        ),
       ),
     );
   }
@@ -125,12 +128,30 @@ function _tipsy_get_settings($new_rule = FALSE) {
             'opacity' => '0.8',
             'offset' => 0,
             'html' => 0,
-            'title' => 'title',
+            'tooltip_content' => array(
+              'source' => 'attribute',
+              'selector' => 'title'
+            ),
           ),
         ),
       ),
     );
     $settings = variable_get('tipsy', $wide_settings);
+
+    // Convert settings for tipsy older than 7.x-1.0-beta2.
+    $converted_settings = FALSE;
+    foreach ($settings['custom_selectors'] as $id => &$selector) {
+      if (isset($selector['options']['title'])) {
+        $selector['options']['tooltip_content']['source'] = 'attribute';
+        $selector['options']['tooltip_content']['selector'] = $selector['options']['title'];
+        unset($selector['options']['title']);
+        $converted_settings = TRUE;
+      }
+    }
+    if ($converted_settings) {
+      dsm('converted');
+      variable_set('tipsy', $settings);
+    }
   }
   return $settings;
 }

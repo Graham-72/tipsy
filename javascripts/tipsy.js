@@ -27,14 +27,18 @@
         $(selectors).each(function(){
           var selector = $(this)[0].selector;
           var options = $(this)[0].options;
-          var r = /^".*"$/;
-          if (r.exec(options.title) != null) {
-            options.title = options.title.replace(/"/g, '');
-          } else {
-            //var f = new Function("f", "return f;");
+          var tooltipElement = $(selector);
+
+          if (options.tooltip_content.source == 'attribute') {
+            var title = options.tooltip_content.selector;
           }
-          $(selector).tipsy({
-            title: options.title,
+          else {
+            var title = function() {
+              return $(options.tooltip_content.selector, tooltipElement).html();
+            }
+          }
+          tooltipElement.tipsy({
+            title: title,
             html: parseInt(options.html),
             delayIn: parseInt(options.delayIn),
               delayOut: parseInt(options.delayOut),
