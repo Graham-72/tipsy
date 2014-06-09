@@ -41,6 +41,8 @@ function tipsy_library() {
  * Implements hook_menu().
  */
 function tipsy_menu() {
+  $items = array();
+
   $items['admin/config/user-interface/tipsy'] = array(
     'title' => t("Tipsy"),
     'description' => t('Integrates tipsy tooltips with Drupal'),
@@ -50,6 +52,7 @@ function tipsy_menu() {
     'page arguments' => array('tipsy_admin'),
     'file' => 'tipsy.admin.inc',
   );
+
   return $items;
 }
 
@@ -57,11 +60,11 @@ function tipsy_menu() {
  * Implements hook_perm().
  */
 function tipsy_permission() {
-  $permissions = array(
-    'administer tipsy' => array(
-      'title' => t('Administer tipsy'),
-      'description' => t('Allows users to configure tipsy.'),
-    ),
+  $permissions = array();
+
+  $permissions['administer tipsy'] = array(
+    'title' => t('Administer tipsy'),
+    'description' => t('Allows users to configure tipsy.'),
   );
 
   return $permissions;
