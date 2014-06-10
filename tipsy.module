@@ -3,7 +3,7 @@
 /**
  * Implements hook_page_build().
  */
-function hook_page_build(&$page) {
+function tipsy_page_build(&$page) {
   drupal_add_library('tipsy', 'tipsy', TRUE);
 }
 
