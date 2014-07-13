@@ -83,7 +83,7 @@ function tipsy_theme() {
 }
 
 /**
- * Helper function to retreive all settings for tipsy
+ * Helper function to retrieve all settings for tipsy
  */
 function _tipsy_get_settings($new_rule = FALSE) {
   if ($new_rule == TRUE) {
