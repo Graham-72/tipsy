@@ -5,10 +5,11 @@
  */
 function tipsy_admin($form, &$form_state) {
   $settings = _tipsy_get_settings();
+  $module_path = drupal_get_path('module', 'tipsy');
   $form = array();
 
-  $form['#attached']['js'][] = drupal_get_path('module', 'tipsy') . '/javascripts/tipsy.admin.js';
-  $form['#attached']['css'][] = drupal_get_path('module', 'tipsy') . '/stylesheets/tipsy.admin.css';
+  $form['#attached']['js'][] = $module_path . '/javascripts/tipsy.admin.js';
+  $form['#attached']['css'][] = $module_path . '/stylesheets/tipsy.admin.css';
 
   $form['drupal_forms'] = array(
     '#type' => 'fieldset',
