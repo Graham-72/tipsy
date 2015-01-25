@@ -32,6 +32,16 @@
           if (options.tooltip_content.source == 'attribute') {
             var title = options.tooltip_content.selector;
           }
+          else if (options.tooltip_content.source == 'sibling') {
+            tooltipElement.siblings(options.tooltip_content.selector).hide();
+            var title =  function(){
+              var desc = $(this).siblings(options.tooltip_content.selector);
+              if(desc.length > 0) {
+                return desc.html();
+              }
+              return '';
+            }
+          }
           else {
             var title = function() {
               return $(options.tooltip_content.selector, tooltipElement).html();
