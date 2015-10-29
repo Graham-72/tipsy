@@ -187,7 +187,11 @@ function tipsy_options_form($settings = FALSE, $drupal_forms = FALSE) {
       '#type' => 'radios',
       '#title' => t('Source'),
       '#default_value' => $settings['options']['tooltip_content']['source'],
-      '#options' => array('attribute' => t('HTML attribute'), 'child' => t('Child element'), 'sibling' => t("Sibling element")),
+      '#options' => array(
+        'attribute' => t('HTML attribute'),
+        'child' => t('Child element'),
+        'sibling' => t('Sibling element'),
+      ),
     );
     $form['tooltip_content']['selector'] = array(
       '#type' => 'textarea',
@@ -243,7 +247,9 @@ function theme_tipsy_custom_selectors_form($variables) {
 }
 
 /**
- * Implementation of hook_validate for admin form.
+ * Implements hook_validate().
+ *
+ * Validation is for admin form.
  */
 function tipsy_admin_validate($form, &$form_values) {
   $drupal_forms = $form_values['values']['wrapper'];
@@ -265,16 +271,16 @@ function tipsy_admin_validate($form, &$form_values) {
   foreach ($form_values['values']['rules'] as $delta => $rule) {
     if (trim($rule['selector']) != '') {
       if (!is_numeric($rule['options']['delayIn']) || $rule['options']['delayIn'] == '') {
-        form_set_error('rules][' . $delta .  '][options][delayIn', t('Invalid value'));
+        form_set_error('rules][' . $delta . '][options][delayIn', t('Invalid value'));
       }
       if (!is_numeric($rule['options']['delayOut']) || $rule['options']['delayOut'] == '') {
-        form_set_error('rules][' . $delta .  '][options][delayOut', t('Invalid value'));
+        form_set_error('rules][' . $delta . '][options][delayOut', t('Invalid value'));
       }
       if (!is_numeric($rule['options']['opacity']) || $rule['options']['opacity'] == '') {
-        form_set_error('rules][' . $delta .  '][options][opacity', t('Invalid value'));
+        form_set_error('rules][' . $delta . '][options][opacity', t('Invalid value'));
       }
       if (!is_numeric($rule['options']['offset']) || $rule['options']['offset'] == '') {
-        form_set_error('rules][' . $delta .  '][options][offset', t('Invalid value'));
+        form_set_error('rules][' . $delta . '][options][offset', t('Invalid value'));
       }
     }
   }
