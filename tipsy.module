@@ -1,29 +1,31 @@
 <?php
 
 /**
- * Implements hook_page_build().
+ * Implements hook_preprocess_page().
+ * Replaces hook_init().
  */
-function tipsy_page_build(&$page) {
-  drupal_add_library('tipsy', 'tipsy', TRUE);
+function tipsy_preprocess_page(&$variables)
+{
+  backdrop_add_library('tipsy', 'tipsy', TRUE);
+	backdrop_add_js(backdrop_get_path('module', 'tipsy').'/javascripts/tipsy.js');
+	backdrop_add_js(backdrop_get_path('module', 'tipsy').'/javascripts/tipsy.admin.js');
 }
 
 /**
- * Implements hook_library().
+ * Implements hook_library_info().
+ * Replaces hook_library().
  */
-function tipsy_library() {
-  $module_path = drupal_get_path('module', 'tipsy');
-  $libraries = array();
-
+function tipsy_library_info() {
+	$path = libraries_get_path('tipsy');
   $libraries['tipsy'] = array(
     'title' => 'Tipsy',
     'website' => 'http://onehackoranother.com/projects/jquery/tipsy/',
     'version' => '0.1.7',
     'js' => array(
-      $module_path . '/javascripts/jquery.tipsy.js' => array(),
-      $module_path . '/javascripts/tipsy.js' => array(),
+      $path . '/jquery.tipsy.js' => array(),
     ),
     'css' => array(
-      $module_path . '/stylesheets/tipsy.css' => array(
+      $path . '/tipsy.css' => array(
         'type' => 'file',
         'media' => 'screen',
       ),
@@ -31,10 +33,10 @@ function tipsy_library() {
   );
 
   $settings = _tipsy_get_settings();
-  if ($settings['drupal_forms']['forms'] == 0) {
-    unset($settings['drupal_forms']);
+  if ($settings['backdrop_forms']['forms'] == 0) {
+    unset($settings['backdrop_forms']);
   }
-  drupal_add_js(array('tipsy' => $settings), 'setting');
+  backdrop_add_js(array('tipsy' => $settings), 'setting');
 
   return $libraries;
 }
@@ -42,13 +44,14 @@ function tipsy_library() {
 /**
  * Implements hook_menu().
  */
-function tipsy_menu() {
+function tipsy_menu()
+{
   $items = array();
 
-  $items['admin/config/user-interface/tipsy'] = array(
+  $items['admin/config/content/tipsy'] = array(
     'title' => 'Tipsy',
-    'description' => 'Integrates tipsy tooltips with Drupal',
-    'page callback' => 'drupal_get_form',
+    'description' => 'Integrates tipsy tooltips with Backdrop',
+    'page callback' => 'backdrop_get_form',
     'access callback' => 'user_access',
     'access arguments' => array('administer tipsy'),
     'page arguments' => array('tipsy_admin'),
@@ -61,12 +64,13 @@ function tipsy_menu() {
 /**
  * Implements hook_perm().
  */
-function tipsy_permission() {
+function tipsy_permission()
+{
   $permissions = array();
 
   $permissions['administer tipsy'] = array(
-    'title' => t('Administer tipsy'),
-    'description' => t('Allows users to configure tipsy.'),
+    'title' => t('Administer Tipsy'),
+    'description' => t('Allows users to configure Tipsy.'),
   );
 
   return $permissions;
@@ -75,7 +79,8 @@ function tipsy_permission() {
 /**
  * Implements hook_theme().
  */
-function tipsy_theme() {
+function tipsy_theme()
+{
   return array(
     'tipsy_custom_selectors_form' => array(
       'render element' => 'form',
@@ -87,75 +92,20 @@ function tipsy_theme() {
 /**
  * Helper function to retrieve all settings for tipsy.
  */
-function _tipsy_get_settings($new_rule = FALSE) {
-  if ($new_rule == TRUE) {
-    $settings = array(
-      'selector' => '',
-      'options' => array(
-        'fade' => 1,
-        'gravity' => 'w',
-        'delayIn' => 0,
-        'delayOut' => 0,
-        'trigger' => 'hover',
-        'opacity' => '0.8',
-        'offset' => 0,
-        'html' => 0,
-        'tooltip_content' => array(
-          'source' => 'attribute',
-          'selector' => 'title',
-        ),
-      ),
-    );
-  }
-  else {
-    $wide_settings = array(
-      'drupal_forms' => array(
-        'forms' => FALSE,
-        'options' => array(
-          'fade' => 1,
-          'gravity' => 'autoWE',
-          'delayIn' => 0,
-          'delayOut' => 0,
-          'trigger' => 'focus',
-          'opacity' => '0.8',
-          'offset' => 0,
-        ),
-      ),
-      'custom_selectors' => array(
-        0 => array(
-          'selector' => '.tipsy',
-          'options' => array(
-            'fade' => 1,
-            'gravity' => 'w',
-            'delayIn' => 0,
-            'delayOut' => 0,
-            'trigger' => 'hover',
-            'opacity' => '0.8',
-            'offset' => 0,
-            'html' => 0,
-            'tooltip_content' => array(
-              'source' => 'attribute',
-              'selector' => 'title',
-            ),
-          ),
-        ),
-      ),
-    );
-    $settings = variable_get('tipsy', $wide_settings);
-
-    // Convert settings for tipsy older than 7.x-1.0-beta2.
-    $converted_settings = FALSE;
-    foreach ($settings['custom_selectors'] as &$selector) {
-      if (isset($selector['options']['title'])) {
-        $selector['options']['tooltip_content']['source'] = 'attribute';
-        $selector['options']['tooltip_content']['selector'] = $selector['options']['title'];
-        unset($selector['options']['title']);
-        $converted_settings = TRUE;
-      }
-    }
-    if ($converted_settings) {
-      variable_set('tipsy', $settings);
-    }
-  }
+function _tipsy_get_settings()
+{
+  $settings = config_get('tipsy.settings');
   return $settings;
+}
+
+/**
+ * Implements hook_config_info().
+ */
+function tipsy_config_info()
+{
+  $prefixes['tipsy.settings'] = array(
+    'label' => t('Tipsy'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
 }

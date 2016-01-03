@@ -1,5 +1,5 @@
-name = Tipsy tooltips
-description = Integrates <a href="http://onehackoranother.com/projects/jquery/tipsy/">Tipsy</a> jQuery plugin for creating a Facebook-like tooltips effect.
-core = 7.x
-
-configure = admin/config/user-interface/tipsy
+name = Tipsy
+description = Integrates jQuery plugin Tipsy to create a Facebook-like tooltips effect.
+backdrop = 1.x
+type = module
+configure = admin/config/content/tipsy

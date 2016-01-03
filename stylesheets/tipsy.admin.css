@@ -1,16 +1,16 @@
-#tipsy-drupal-forms-wrapper .form-radios .form-item {
+#tipsy-backdrop-forms-wrapper .form-radios .form-item {
   float:left;
   width:300px;
   clear:none;
 }
 
-#tipsy-drupal-forms-wrapper .form-item,
+#tipsy-backdrop-forms-wrapper .form-item,
 #tipsy-custom-selectors .form-item {
   clear:both;
   padding:2px 0;
 }
 
-#tipsy-drupal-forms-wrapper .form-item label {
+#tipsy-backdrop-forms-wrapper .form-item label {
   float:left;
   width:300px;
 }

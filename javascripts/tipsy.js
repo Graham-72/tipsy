@@ -1,14 +1,16 @@
 (function($) {
-  Drupal.behaviors.tipsy = {
+	Backdrop.tipsy = Backdrop.tipsy || {};
+
+  Backdrop.behaviors.tipsy = {
     attach: function(context, settings) {
       // Forms tooltips.
-      if (Drupal.settings.tipsy.drupal_forms) {
+      if (Backdrop.settings.tipsy.backdrop_forms) {
         var formElement = $('.form-item');
         formElement.each(function(){
           var desc = $(this).find('.description');
           desc.css('display', 'none');
           if(desc.length > 0) {
-            formSettings = Drupal.settings.tipsy.drupal_forms.options;
+            formSettings = Backdrop.settings.tipsy.backdrop_forms.options;
             $(this).find('input[type=text],input[type=password],textarea,select,.option').tipsy({
               title: function() { return desc.html(); },
               html: true,
@@ -23,13 +25,24 @@
           }
         });
       }
-      // Custom selectors tooltips.
-      $.each(Drupal.settings.tipsy.custom_selectors, function(){
-        var selector = $(this)[0].selector;
-        var options = $(this)[0].options;
+      if (Backdrop.settings.tipsy.tipsy_custom_selectors) {
+        var selectors = Backdrop.settings.tipsy.tipsy_custom_selectors;
+        $(selectors).each(function(){
+          var option = $(this)[0].option;
+					var options = $(this)[0].option.options;
+					var selector = options.tooltip_content['selector'];
         var tooltipElement = $(selector);
 
+          if (options.tooltip_content.source == 'attribute') {
+            var title = options.tooltip_content.selector;
+          }
+          else {
+            var title = function() {
+              return $(options.tooltip_content.selector, tooltipElement).html();
+            }
+          }
         tooltipElement.tipsy({
+          title: title,
           html: parseInt(options.html),
           delayIn: parseInt(options.delayIn),
           delayOut: parseInt(options.delayOut),
@@ -40,6 +53,7 @@
           trigger: options.trigger
         });
       });
+      }
     }
   };
 

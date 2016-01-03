@@ -13,12 +13,7 @@ function tipsy_install() {
     ->fields(array('weight' => 999))
     ->condition('name', 'tipsy')
     ->execute();
-  drupal_set_message(t("Tipsy has been successfully installed. Visit the <a href=@href>settings page</a> for tooltips of your choice.", array('@href' => base_path() . 'admin/config/user-interface/tipsy')));
+  backdrop_set_message(t("Tipsy has been successfully installed. Visit the <a href=@href>settings page</a> for tooltips of your choice.", array('@href' => base_path() . 'admin/config/content/tipsy')));
 }
 
-/**
- * Implements hook_uninstall().
- */
-function tipsy_uninstall() {
-  variable_del('tipsy');
-}
+

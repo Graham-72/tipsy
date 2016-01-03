@@ -3,35 +3,38 @@
 /**
  * Implementation of tipsy admin form.
  */
-function tipsy_admin($form, &$form_state) {
+function tipsy_admin($form, &$form_state)
+{
   $settings = _tipsy_get_settings();
-  $module_path = drupal_get_path('module', 'tipsy');
+  $module_path = backdrop_get_path('module', 'tipsy');
   $form = array();
 
   $form['#attached']['js'][] = $module_path . '/javascripts/tipsy.admin.js';
   $form['#attached']['css'][] = $module_path . '/stylesheets/tipsy.admin.css';
 
-  $form['drupal_forms'] = array(
+  // Set General Settings for all site forms
+  $form['backdrop_forms'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Drupal forms general settings'),
+    '#title' => t('Backdrop forms general settings'),
     '#weight' => -5,
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  $form['drupal_forms']['forms'] = array(
+  $form['backdrop_forms']['forms'] = array(
     '#type' => 'checkbox',
-    '#default_value' => $settings['drupal_forms']['forms'],
-    '#title' => t('Apply Tipsy for form items descriptions on all Drupal forms.'),
+    '#default_value' => $settings['tipsy_backdrop_forms']['forms'],
+    '#title' => t('Apply Tipsy for form items descriptions on all Backdrop forms.'),
     '#description' => t('This will automatically enable Tipsy tooltips to form elements descriptions.'),
   );
-  $form['drupal_forms']['wrapper'] = array(
+  $form['backdrop_forms']['wrapper'] = array(
     '#tree' => TRUE,
     '#weight' => 0,
-    '#prefix' => '<div class="clear-block" id="tipsy-drupal-forms-wrapper">',
+    '#prefix' => '<div class="clear-block" id="tipsy-backdrop-forms-wrapper">',
     '#suffix' => '</div>',
   );
-  $form['drupal_forms']['wrapper']['options'] = tipsy_options_form($settings['drupal_forms'], TRUE);
+  $form['backdrop_forms']['wrapper']['options'] = tipsy_options_form($settings['tipsy_backdrop_forms'], TRUE);
 
+  // Set Custom Selectors form
   $form['custom_selectors'] = array(
     '#type' => 'fieldset',
     '#title' => t('Custom selectors'),
@@ -57,12 +60,11 @@ function tipsy_admin($form, &$form_state) {
       'effect' => 'fade',
     ),
   );
-  if ($settings['custom_selectors']) {
-    foreach ($settings['custom_selectors'] as $delta => $options) {
+  if ($settings['tipsy_custom_selectors']) {
+    foreach ($settings['tipsy_custom_selectors'] as $delta => $options) {
       $form['custom_selectors']['rules'][$delta] = tipsy_custom_selector_form($options);
     }
-  }
-  else {
+  } else {
     $form['custom_selectors']['rules'][0] = tipsy_custom_selector_form();
   }
 
@@ -83,16 +85,22 @@ function tipsy_admin($form, &$form_state) {
 /**
  * AJAX callback to render the tipsy rules form.
  */
-function tipsy_admin_callback($form, $form_state) {
+function tipsy_admin_callback($form, $form_state)
+{
   return $form['custom_selectors']['rules'];
 }
 
 /**
  * Implementation of form function for the tooltip options.
+ * If $backdrop_forms = TRUE, we apply Tipsy on all forms
+ * If $backdrop_forms = FALSE, we are dealing with custom settings.
+
  */
-function tipsy_options_form($settings = FALSE, $drupal_forms = FALSE) {
-  if ($settings == FALSE) {
-    $settings = _tipsy_get_settings(TRUE);
+function tipsy_options_form($settings = FALSE, $backdrop_forms = FALSE)
+{
+  if ($backdrop_forms) {
+    $settings = _tipsy_get_settings();
+    $settings = $settings['tipsy_backdrop_forms'];
   }
 
   $form = array();
@@ -170,7 +178,7 @@ function tipsy_options_form($settings = FALSE, $drupal_forms = FALSE) {
     '#maxlength' => 5,
     '#weight' => 7,
   );
-  if ($drupal_forms == TRUE) {
+  if ($backdrop_forms == TRUE) {
     $form['html'] = array(
       '#type' => 'checkbox',
       '#default_value' => $settings['options']['html'],
@@ -212,14 +220,15 @@ function tipsy_options_form($settings = FALSE, $drupal_forms = FALSE) {
 /**
  * Implementation of a single tipsy rule form.
  */
-function tipsy_custom_selector_form($options = FALSE) {
+function tipsy_custom_selector_form($options = FALSE)
+{
   $form = array();
   $form['#tree'] = TRUE;
   $form['selector'] = array(
     '#type' => 'textarea',
     '#weight' => 1,
     '#rows' => 2,
-    '#default_value' => $options['selector'],
+    '#default_value' => $options['options']['name'],
   );
   $form['options'] = tipsy_options_form($options);
   return $form;
@@ -228,21 +237,22 @@ function tipsy_custom_selector_form($options = FALSE) {
 /**
  * Theme the table form for tipsy rules.
  */
-function theme_tipsy_custom_selectors_form($variables) {
+function theme_tipsy_custom_selectors_form($variables)
+{
   $form = $variables['form'];
   $rows = array();
   $headers = array(t('Selectors'), t('Options'));
   foreach (element_children($form) as $key) {
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['selector'])),
-        array('data' => drupal_render($form[$key]['options'])),
+        array('data' => backdrop_render($form[$key]['selector'])),
+        array('data' => backdrop_render($form[$key]['options'])),
       ),
     );
     $rows[] = $row;
   }
   $output = theme('table', array('header' => $headers, 'rows' => $rows));
-  $output .= drupal_render_children($form);
+  $output .= backdrop_render_children($form);
   return $output;
 }
 
@@ -251,19 +261,20 @@ function theme_tipsy_custom_selectors_form($variables) {
  *
  * Validation is for admin form.
  */
-function tipsy_admin_validate($form, &$form_values) {
-  $drupal_forms = $form_values['values']['wrapper'];
+function tipsy_admin_validate($form, &$form_values)
+{
+  $backdrop_forms = $form_values['values']['wrapper'];
   if ($form_values['values']['forms'] != 0) {
-    if (!is_numeric($drupal_forms['options']['delayIn']) || $drupal_forms['options']['delayIn'] == '') {
+    if (!is_numeric($backdrop_forms['options']['delayIn']) || $backdrop_forms['options']['delayIn'] == '') {
       form_set_error('wrapper][options][delayIn', t('Invalid value'));
     }
-    if (!is_numeric($drupal_forms['options']['delayOut']) || $drupal_forms['options']['delayOut'] == '') {
+    if (!is_numeric($backdrop_forms['options']['delayOut']) || $backdrop_forms['options']['delayOut'] == '') {
       form_set_error('wrapper][options][delayOut', t('Invalid value'));
     }
-    if (!is_numeric($drupal_forms['options']['opacity']) || $drupal_forms['options']['opacity'] == '') {
+    if (!is_numeric($backdrop_forms['options']['opacity']) || $backdrop_forms['options']['opacity'] == '') {
       form_set_error('wrapper][options][opacity', t('Invalid value'));
     }
-    if (!is_numeric($drupal_forms['options']['offset']) || $drupal_forms['options']['offset'] == '') {
+    if (!is_numeric($backdrop_forms['options']['offset']) || $backdrop_forms['options']['offset'] == '') {
       form_set_error('wrapper][options][offset', t('Invalid value'));
     }
   }
@@ -289,27 +300,30 @@ function tipsy_admin_validate($form, &$form_values) {
 /**
  * Implementation of form submit function for the admin form.
  */
-function tipsy_admin_submit($form, &$form_values) {
+function tipsy_admin_submit($form, &$form_values)
+{
   $settings = array();
-  $drupal_forms = $form_values['values']['wrapper'];
-
-  $settings['drupal_forms'] = array(
-    'forms' => $form_values['values']['forms'],
-    'options' => array(
-      'fade' => $drupal_forms['options']['fade'],
-      'gravity' => $drupal_forms['options']['gravity'],
-      'delayIn' => trim($drupal_forms['options']['delayIn']),
-      'delayOut' => trim($drupal_forms['options']['delayOut']),
-      'trigger' => $drupal_forms['options']['trigger'],
-      'opacity' => trim($drupal_forms['options']['opacity']),
-      'offset' => trim($drupal_forms['options']['offset']),
-    ),
+  $backdrop_forms = $form_values['values']['wrapper'];
+  $settings['forms'] = $form_values['values']['forms'];
+  $settings['options'] = array(
+    'fade' => $backdrop_forms['options']['fade'],
+    'gravity' => $backdrop_forms['options']['gravity'],
+    'delayIn' => trim($backdrop_forms['options']['delayIn']),
+    'delayOut' => trim($backdrop_forms['options']['delayOut']),
+    'trigger' => $backdrop_forms['options']['trigger'],
+    'opacity' => trim($backdrop_forms['options']['opacity']),
+    'offset' => trim($backdrop_forms['options']['offset']),
   );
+  config_set('tipsy.settings', 'tipsy_backdrop_forms', $settings);
+
+  $settings = array();
+
   foreach ($form_values['values']['rules'] as $delta => $rule) {
     if (trim($rule['selector']) != '') {
-      $settings['custom_selectors'][] = array(
-        'selector' => trim($rule['selector']),
+      $selectorname = 'option_' . trim($rule['selector']);
+      $settings[$selectorname] = array(
         'options' => array(
+          'name' => trim($rule['selector']),
           'fade' => $rule['options']['fade'],
           'gravity' => $rule['options']['gravity'],
           'trigger' => $rule['options']['trigger'],
@@ -326,6 +340,6 @@ function tipsy_admin_submit($form, &$form_values) {
       );
     }
   }
-  variable_set('tipsy', $settings);
-  drupal_set_message(t('Configuration saved'));
+  config_set('tipsy.settings', 'tipsy_custom_selectors', $settings);
+  backdrop_set_message(t('Configuration saved'));
 }
